@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer } from 'react';
+import React, { useCallback, useEffect, useReducer } from 'react';
 import './App.scss';
 import Header from './components/Header/Header';
 import Menu from './components/Menu/Menu';
@@ -10,7 +10,8 @@ import Footer from './components/Footer/Footer';
 import ThemeButton from './components/UI/ThemeButton/ThemeButton';
 import ThemeContext from './context/ThemeContext';
 import AuthContext from './context/AuthContext';
-
+import BestHotel from './components/Hotels/BestHotel/BestHotel';
+import InspiringQuote from './components/InspiringQuote/InspiringQuote';
 const backendHotels = [
   {
     id: 1,
@@ -32,6 +33,18 @@ const backendHotels = [
   },
 ];
 
+const initialState = {
+  hotels: [],
+  loading: true,
+  theme: '',
+  isAuthenticated: false,
+};
+
+//leniwa funkcja inicjalizujca ktora edytuje poczatkowy stan i potem go wypluwa
+const init = (initState) => {
+  initState.theme = 'warning';
+  return initState;
+};
 function App() {
   // const [hotels, setHotels] = useState([]);
   // const [loading, setLoading] = useState(true);
@@ -61,20 +74,18 @@ function App() {
         return { ...state, loading: action.loading };
       case 'set-isauthenticated':
         return { ...state, isAuthenticated: action.isAuthenticated };
-
+      case 'login':
+        return { ...state, isAuthenticated: true };
+      case 'logout':
+        return { ...state, isAuthenticated: false };
       default:
         throw new Error('Nie ma takiej akcji: ', action.type);
     }
   };
-  const initialState = {
-    hotels: [],
-    loading: true,
-    theme: 'danger',
-    isAuthenticated: false,
-  };
+
   // dispatch - wysylaja jakas informacje,
   //korzysta z 2 parametrow (1 to jakas funkcja, 2 to wartosc domyslna  )
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(reducer, initialState, init);
 
   const changeTheme = () => {
     dispatch({ type: 'change-theme' });
@@ -90,6 +101,14 @@ function App() {
     dispatch({ type: 'set-hotels', hotels: newHotels });
   };
 
+  const getBestHotel = useCallback(() => {
+    if (!state.hotels.length < 2) {
+      return null;
+    } else {
+      return state.hotels.sort((a, b) => (a.rating > b.rating ? -1 : 1))[0];
+    }
+  }, [state.hotels]);
+
   useEffect(() => {
     setTimeout(() => {
       // setHotels(backendHotels);
@@ -101,6 +120,7 @@ function App() {
 
   const header = (
     <Header>
+      <InspiringQuote />
       <Searchbar onSearch={(term) => searchHandler(term)} />
       <ThemeButton onChange={changeTheme} />
     </Header>
@@ -108,7 +128,10 @@ function App() {
   const content = state.loading ? (
     <LoadingIcon />
   ) : (
-    <Hotels hotels={state.hotels} />
+    <>
+      <BestHotel getHotel={getBestHotel} />
+      <Hotels hotels={state.hotels} />
+    </>
   );
   const menu = <Menu />;
   const footer = <Footer />;
@@ -117,11 +140,9 @@ function App() {
       value={{
         isAuthenticated: state.isAuthenticated,
         // login: () => setIsAuthenticated(true),
-        login: () =>
-          dispatch({ type: 'set-isauthenticated', isAuthenticated: true }),
+        login: () => dispatch({ type: 'login' }),
         // logout: () => setIsAuthenticated(false),
-        logout: () =>
-          dispatch({ type: 'set-isauthenticated', isAuthenticated: false }),
+        logout: () => dispatch({ type: 'logout' }),
       }}
     >
       <ThemeContext.Provider
