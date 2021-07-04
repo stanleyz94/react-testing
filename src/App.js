@@ -17,6 +17,7 @@ import Hotel from './pages/Hotel';
 import { reducer, initialState } from './reducer';
 import Home from './pages/Home';
 import Search from './pages/Search';
+import Profile from './pages/Profile/Profile';
 
 //leniwa funkcja inicjalizujca ktora edytuje poczatkowy stan i potem go wypluwa
 const init = (initState) => {
@@ -49,7 +50,8 @@ function App() {
       <Switch>
         <Route path='/hotele/:id' component={Hotel} />
         <Route path='/wyszukaj/:term' component={Search} />
-        <Route exact path='/'>
+        <Route path='/profil' component={Profile} />
+        <Route exact={true} path='/'>
           <Home />
         </Route>
       </Switch>
