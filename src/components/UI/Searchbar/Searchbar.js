@@ -11,7 +11,7 @@ function Searchbar(props) {
   const inputRef = useRef(null);
   const search = () => {
     // console.log('szukaj', term);
-    props.onSearch(term);
+    // props.onSearch(term);
   };
 
   const onKeyDownHandler = (e) => {

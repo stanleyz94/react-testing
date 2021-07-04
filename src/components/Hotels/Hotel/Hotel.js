@@ -5,7 +5,7 @@ import styles from './Hotel.module.css';
 import hotelImg from '../../../assets/images/hotel.jpg';
 import ThemeContext from '../../../context/ThemeContext';
 import useAuth from '../../../hooks/useAuth';
-
+import { Link } from 'react-router-dom';
 const propTypes = {
   name: PropTypes.string.isRequired,
   city: PropTypes.string.isRequired,
@@ -40,14 +40,16 @@ function Hotel(props) {
               </div>
               <div className='col text-right'>
                 <h5>Ocena: {props.rating}</h5>
-
-                <a
-                  href='#'
-                  onClick={clickHandler}
+                <Link
+                  to={`/hotele/${props.id}`}
                   className={`btn btn-${theme.color} mt-2 px-4`}
                 >
                   Pokaż
-                </a>
+                </Link>
+                {/* <a
+                  href='#'
+                    onClick={clickHandler}
+                ></a> */}
               </div>
             </div>
           </div>
