@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useLayoutEffect } from 'react';
 
 const quotes = [
   'Podróże to jedyna rzecz na którą wydajemy pieniądze, a stajemy się bogatsi.” – Anonim',
@@ -12,24 +12,26 @@ const quotes = [
 
 const styles = {
   position: 'absolute',
-  top: '20px',
+  padding: '10px',
+  top: '10px',
   left: 0,
   right: 0,
   textAlign: 'center',
   color: '#fff',
+  fontStyle: 'italic',
 };
 
 const InspiringQuote = (props) => {
   const [quote, setQuote] = useState('Wczytywanie cytatu..');
   const [loading, setLoading] = useState(true);
-
+  //asynchroniczna
   useEffect(() => {
     ///...
     setLoading(false);
   }, []);
-
-  useEffect(() => {
-    setQuote(quotes[0]);
+  //synchroniczna
+  useLayoutEffect(() => {
+    setQuote(quotes[Math.floor(Math.random() * quotes.length)]);
   }, [loading]);
   return <p style={styles}>{quote}</p>;
 };

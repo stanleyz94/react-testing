@@ -12,6 +12,10 @@ import ThemeContext from './context/ThemeContext';
 import AuthContext from './context/AuthContext';
 import BestHotel from './components/Hotels/BestHotel/BestHotel';
 import InspiringQuote from './components/InspiringQuote/InspiringQuote';
+import useLocalStorage from './hooks/useLocalStorage';
+import LastHotel from './components/Hotels/LastHotel/LastHotel';
+import useWebsiteTitle from './hooks/useWebsiteTitle';
+
 const backendHotels = [
   {
     id: 1,
@@ -37,7 +41,7 @@ const initialState = {
   hotels: [],
   loading: true,
   theme: '',
-  isAuthenticated: false,
+  isAuthenticated: true,
 };
 
 //leniwa funkcja inicjalizujca ktora edytuje poczatkowy stan i potem go wypluwa
@@ -86,9 +90,19 @@ function App() {
   // dispatch - wysylaja jakas informacje,
   //korzysta z 2 parametrow (1 to jakas funkcja, 2 to wartosc domyslna  )
   const [state, dispatch] = useReducer(reducer, initialState, init);
-
+  const [lastHotel, setLastHotel] = useLocalStorage('last-hotel', null);
+  useWebsiteTitle('Strona główna');
   const changeTheme = () => {
     dispatch({ type: 'change-theme' });
+  };
+
+  const openHotel = (hotel) => {
+    setLastHotel(hotel);
+    console.log('clicked', hotel);
+  };
+
+  const removeLastHotel = () => {
+    setLastHotel(null);
   };
 
   const searchHandler = (term) => {
@@ -102,7 +116,7 @@ function App() {
   };
 
   const getBestHotel = useCallback(() => {
-    if (!state.hotels.length < 2) {
+    if (!state.hotels.length) {
       return null;
     } else {
       return state.hotels.sort((a, b) => (a.rating > b.rating ? -1 : 1))[0];
@@ -129,8 +143,11 @@ function App() {
     <LoadingIcon />
   ) : (
     <>
-      <BestHotel getHotel={getBestHotel} />
-      <Hotels hotels={state.hotels} />
+      {lastHotel ? (
+        <LastHotel {...lastHotel} onRemove={removeLastHotel} />
+      ) : null}
+      {getBestHotel() ? <BestHotel getHotel={getBestHotel} /> : null}
+      <Hotels onOpen={openHotel} hotels={state.hotels} />
     </>
   );
   const menu = <Menu />;

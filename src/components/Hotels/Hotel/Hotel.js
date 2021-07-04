@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import styles from './Hotel.module.css';
 import hotelImg from '../../../assets/images/hotel.jpg';
 import ThemeContext from '../../../context/ThemeContext';
+import useAuth from '../../../hooks/useAuth';
 
 const propTypes = {
   name: PropTypes.string.isRequired,
@@ -16,7 +17,14 @@ const defaultProps = {
   missing: false,
 };
 function Hotel(props) {
+  const [auth] = useAuth();
   const theme = useContext(ThemeContext);
+
+  const clickHandler = (e) => {
+    e.preventDefault();
+    props.onOpen(props);
+  };
+
   return (
     <div className={`card ${styles.hotel}`}>
       <div className='card-body'>
@@ -33,7 +41,11 @@ function Hotel(props) {
               <div className='col text-right'>
                 <h5>Ocena: {props.rating}</h5>
 
-                <a href='#' className={`btn btn-${theme.color} mt-2 px-4`}>
+                <a
+                  href='#'
+                  onClick={clickHandler}
+                  className={`btn btn-${theme.color} mt-2 px-4`}
+                >
                   Pokaż
                 </a>
               </div>
@@ -42,6 +54,12 @@ function Hotel(props) {
 
           <div className='col-12'>
             <p className={styles.description}>{props.description}</p>
+
+            {auth ? (
+              <p className='mt-2'>Dostępność: 4 pokoje</p>
+            ) : (
+              <p className='mt-2'>Zaloguj</p>
+            )}
           </div>
         </div>
       </div>
