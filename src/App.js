@@ -1,9 +1,8 @@
-import React, { useReducer } from 'react';
+import React, { useReducer, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import './App.scss';
 import Header from './components/Header/Header';
 import Menu from './components/Menu/Menu';
-
 import Layout from './components/Layout/Layout';
 import Searchbar from './components/UI/Searchbar/Searchbar';
 import Footer from './components/Footer/Footer';
@@ -13,13 +12,18 @@ import AuthContext from './context/AuthContext';
 import ReducerContext from './context/ReducerContext';
 import InspiringQuote from './components/InspiringQuote/InspiringQuote';
 import Hotel from './pages/Hotel';
-
 import { reducer, initialState } from './reducer';
 import Home from './pages/Home';
 import Search from './pages/Search';
-import Profile from './pages/Profile/Profile';
+import NotFound from './pages/404/404';
+import Login from './pages/Auth/Login/Login';
+import AuthenticatedRoute from './components/AuthenticatedRoute/AuthenticatedRoute';
+import ErrorBoundary from './hoc/ErrorBoundary';
+
+const Profile = lazy(() => import('./pages/Profile/Profile'));
 
 //leniwa funkcja inicjalizujca ktora edytuje poczatkowy stan i potem go wypluwa
+
 const init = (initState) => {
   initState.theme = 'warning';
   return initState;
@@ -47,14 +51,18 @@ function App() {
   );
   const content = (
     <div>
-      <Switch>
-        <Route path='/hotele/:id' component={Hotel} />
-        <Route path='/wyszukaj/:term' component={Search} />
-        <Route path='/profil' component={Profile} />
-        <Route exact={true} path='/'>
-          <Home />
-        </Route>
-      </Switch>
+      <ErrorBoundary>
+        <Suspense fallback={<p>Ładowanie...</p>}>
+          <Switch>
+            <AuthenticatedRoute path='/profil' component={Profile} />
+            <Route path='/hotele/:id' component={Hotel} />
+            <Route path='/wyszukaj/:term?' component={Search} />
+            <Route path='/zaloguj' component={Login} />
+            <Route exact={true} path='/' component={Home} />
+            <Route component={NotFound} />
+          </Switch>
+        </Suspense>
+      </ErrorBoundary>
     </div>
   );
   const menu = <Menu />;
@@ -82,12 +90,14 @@ function App() {
               dispatch: dispatch,
             }}
           >
-            <Layout
-              header={header}
-              menu={menu}
-              content={content}
-              footer={footer}
-            />
+            <ErrorBoundary>
+              <Layout
+                header={header}
+                menu={menu}
+                content={content}
+                footer={footer}
+              />
+            </ErrorBoundary>
           </ReducerContext.Provider>
         </ThemeContext.Provider>
       </AuthContext.Provider>

@@ -6,6 +6,7 @@ import hotelImg from '../../../assets/images/hotel.jpg';
 import ThemeContext from '../../../context/ThemeContext';
 import useAuth from '../../../hooks/useAuth';
 import { Link } from 'react-router-dom';
+import useWebsiteTitle from '../../../hooks/useWebsiteTitle';
 const propTypes = {
   name: PropTypes.string.isRequired,
   city: PropTypes.string.isRequired,
@@ -19,7 +20,7 @@ const defaultProps = {
 function Hotel(props) {
   const [auth] = useAuth();
   const theme = useContext(ThemeContext);
-
+  const setTitle = useWebsiteTitle();
   const clickHandler = (e) => {
     e.preventDefault();
     props.onOpen(props);

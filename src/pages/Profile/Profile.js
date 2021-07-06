@@ -26,8 +26,8 @@ export default function Profile(props) {
 
         <div className='pt-4'>
           <Switch>
-            <Route path={`${path}/edytuj`} component={ProfileDetails} />
             <Route path={`${path}/hotele`} component={MyHotels} />
+            <Route path={`${path}`} component={ProfileDetails} />
           </Switch>
         </div>
       </div>
